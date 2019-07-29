@@ -1,4 +1,4 @@
-# DRLND-project-1
+# DRLND-project-2
 This repository contains an implementation of project 2 for [Udacity's Deep Reinforcement Learning Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893).
 
 ## Project details
