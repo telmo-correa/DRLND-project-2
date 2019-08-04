@@ -7,7 +7,7 @@ from itertools import chain
 
 class GaussianActorCriticNet(nn.Module):
 
-    def __init__(self, state_size, action_size, shared_layers, actor_layers, critic_layers, std_init=0, std_function=None):
+    def __init__(self, state_size, action_size, shared_layers, actor_layers, critic_layers, std_init=0):
         super(GaussianActorCriticNet, self).__init__()
 
         self.shared_network = GaussianActorCriticNet._create_shared_network(state_size, shared_layers)
@@ -17,10 +17,6 @@ class GaussianActorCriticNet(nn.Module):
         self.critic_network = GaussianActorCriticNet._create_critic_network(shared_output_size, critic_layers)
 
         self.std = nn.Parameter(torch.ones(action_size) * std_init)
-        if std_function is None:
-            self.std_function = F.softplus
-        else:
-            self.std_function = std_function
 
 
     @staticmethod
@@ -72,14 +68,14 @@ class GaussianActorCriticNet(nn.Module):
 
         return nn.Sequential(*args)
 
-    def forward(self, states, action=None):
+    def forward(self, states, action=None, std_scale=1.0):
         shared_output = self.shared_network(states)
         mu = self.actor_network(shared_output)
         value = self.critic_network(shared_output)
 
-        distribution = torch.distributions.Normal(mu, self.std_function(self.std))
+        distribution = torch.distributions.Normal(mu, std_scale * F.softplus(self.std))
         if action is None:
-            action = distribution.sample()
+            action = distribution.sample() if std_scale > 0 else mu
 
         log_prob = distribution.log_prob(action)
         entropy = distribution.entropy().sum(-1).unsqueeze(-1)

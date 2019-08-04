@@ -64,6 +64,7 @@ class MultiAgent:
         critic_network_units,
         optimizer_learning_rate=5e-4,
         optimizer_epsilon=1e-5,
+        optimizer_weight_decay=0,
         trajectory_length=1000,
         gamma=0.99,
         gae_lambda=0.9,
@@ -74,7 +75,6 @@ class MultiAgent:
         entropy_penalty_weight=0.01,
         value_loss_weight=1.0,
         std_init=0,
-        std_function=None,
         device=None
     ):
         """
@@ -113,15 +113,15 @@ class MultiAgent:
             shared_layers=shared_network_units,
             actor_layers=actor_network_units,
             critic_layers=critic_network_units,
-            std_init=std_init,
-            std_function=std_function
+            std_init=std_init
         )
         self.network.to(device)
 
         self.optimizer = torch.optim.Adam(
             self.network.parameters(),
             lr=optimizer_learning_rate,
-            eps=optimizer_epsilon
+            eps=optimizer_epsilon,
+            weight_decay=optimizer_weight_decay
         )
 
         # Memory
@@ -144,22 +144,23 @@ class MultiAgent:
         self.max_std = 1
         self.last_act = {}
 
-    def act(self, states):
+    def act(self, states, std_scale=1.0):
         """Evaluates an action for each agent using the current policy, given a list of initial
         states.
 
         :param states:  (list of states) Initial states for each agent
+        :param std_scale:  (float) Scaling parameter for action distribution, default 1
         :return: (list of actions) Actions selected for each agent
         """
         stacked_states = torch.from_numpy(np.stack(states)).float().to(self.device)
-        network_output = self.network(stacked_states)
+        network_output = self.network(stacked_states, std_scale=std_scale)
 
         self.last_act['states'] = states
         self.last_act['network_output'] = network_output
 
         return network_output['action'].cpu().detach().numpy()
 
-    def step(self, states, actions, rewards, next_states, dones):
+    def step(self, states, actions, rewards, next_states, dones, std_scale=1.0):
         """Memorize a single environment step for all agents -- and perform trajectory rollback
         and learning if enough steps have elapsed.
 
@@ -171,6 +172,7 @@ class MultiAgent:
         :param rewards:  (list) Rewards obtained for each agent
         :param next_states:  (list of states) Subsequent states for each agent
         :param dones:  (list) Boolean flags for terminal states
+        :param std_scale:  (float) Scaling parameter for action distribution, default 1
         :return:
         """
         if 'states' in self.last_act and np.all(self.last_act['states'] == states):
@@ -179,7 +181,7 @@ class MultiAgent:
         else:
             stacked_states = torch.from_numpy(np.stack(states)).float().to(self.device)
             stacked_actions = torch.from_numpy(np.stack(actions)).float().to(self.device)
-            network_output = self.network(stacked_states, stacked_actions)
+            network_output = self.network(stacked_states, stacked_actions, std_scale=std_scale)
 
         self.memory.add(
             states=states,
