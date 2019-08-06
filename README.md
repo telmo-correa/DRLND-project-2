@@ -43,12 +43,12 @@ walk you through setting up this environment:
 1. Create (and activate) a new environment with Python 3.6.
     * Linux or Mac:
     ```
-    conda create --name drlnd pythhon=3.6
+    conda create --name drlnd python=3.6
     source activate drlnd
     ```
     * Windows:
     ```
-    conda create --name drlnd pythhon=3.6
+    conda create --name drlnd python=3.6
     conda activate drlnd
     ```
 
