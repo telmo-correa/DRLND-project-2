@@ -20,7 +20,7 @@ For each agent, the state space has 33 dimensions, and the action space has 4 co
 The task is episodic, and it is considered solved when the agent gets an average score of +30 over 100 consecutive
 episodes.
 
-#### Crawler
+### Crawler
 
 An optional / extra / challenge part of the project is to control a Crawler.
 
