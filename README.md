@@ -31,7 +31,7 @@ based on facing the correct orientation and the speed in that orientation.
 
 The environment features 12 agents, each observing a state with dimension 129, and controlling actions with dimension 20.
 
-This environment is based upon the [Unity Crawler environment](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#crawler)
+This environment is based upon the [Unity Crawler environment](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#crawler).
 
 ## Getting started
 
@@ -60,7 +60,7 @@ or the very helpful instructions at [Open AI Spinning Up](https://spinningup.ope
     ```
     git clone https://github.com/telmo-correa/DRLND-project-2
     cd DRLND-project-2
-    pip install .
+    pip install -r requirements.txt
     ```
     
     * Note that there seems to be issues installing unityagents on Windows 10 -- conda looks for a required version of
