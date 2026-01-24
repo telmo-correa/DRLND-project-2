@@ -7,7 +7,7 @@ pytest>=3.2.2
 docopt
 pyyaml
 protobuf==4.25.8
-grpcio==1.53.0
+grpcio==1.53.2
 torch==2.8.0
 pandas
 scipy
